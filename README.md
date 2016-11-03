@@ -53,5 +53,76 @@ To avoid race conditions:
 1. Avoid concurrent modifications
 2. Protect concurrent modifications
 
+## Thread lifecycle
+
+### `Thread.new`
+
+Creates a new thread with initial value and a block to yield. Returns an instance.  
+**!** Thread terminates on block end or on exception inside it.
+
+### `Thread.join`
+
+Wait for thread to terminate.  
+**!** An unhandled exception in child thread will be re-raised.
+
+### `Thread.value`
+
+Joins thread and returns it's value.
+
+### `Thread.status`
+
+Possible status values:
+
+* `'run'` - running
+* `'sleep'` - blocked on mutex / IO
+* `false` - finished / killed
+* `nil` - failed with an exception
+* `'aborting'` - running and dying
+
+### `Thread.stop` & `Thread.wakeup`
+
+See [003_stop_wakeup.rb](003_stop_wakeup.rb).
+
+### `Thread.pass`
+
+Pass one scheduler invocation.
+
+### `Thread#raise` & `Thread#kill`
+
+Raises exception in child thread / kills child thread.  
+**!** Should not be used.
+
+## Concurrency & Parallelism
+
+OS threads are always concurrent (sheduled by *threads scheduler*) but **you can't guarantee** them to run in parallel.
+
+## GIL (Global Interpreter Lock)
+
+**MRI** allows concurrency but prevents parallelism.
+
+GIL - global mutex shared by all process threads.  
+Every Ruby process and process fork has its own GIL.  
+MRI decides on how long GIL is owned by a thread.
+
+### Blocking IO
+
+MRI releases GIL when thread hits *blocking IO* (HTTP reques, console IO, etc.). Therefor *blocking IO* could run in parallel.
+
+### Reasons of GIL
+
+1. Protect Ruby internal C code from race conditions (it is not always thread safe)
+2. Protect calls to C extensions API
+3. Protect developers from race conditions
+
+**!** GIL doesn't guarantee your code will be thread-safe.  
+**!** Concurrent code may be slower than one-threaded (see [004_conc_benchmark.rb](004_conc_benchmark.rb)).
+
+### Other Ruby implementations
+
+**JRuby** and **Rubinius** don't have GIL.  
+They protect their internal code with many fine-grained locks.
+JRuby doesn't support C extensions while Rubinius do.
+Both implementations have less race condition protection than MRI.
+
 [Working With Ruby Threads]: http://www.jstorimer.com/products/working-with-ruby-threads "Working With Ruby Threads"
 
