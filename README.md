@@ -124,5 +124,31 @@ They protect their internal code with many fine-grained locks.
 JRuby doesn't support C extensions while Rubinius do.
 Both implementations have less race condition protection than MRI.
 
+## Number of threads
+
+On **Mac OS** hard limit is ~ 2046 threads per process while on **Linux** you can spawn > 10.000.
+
+Higher number of threads lead to higher *context switching* overhead.
+
+You code could be:
+
+1. IO-bound (a lot of blocking IO)
+2. CPU-bound (a lot of computations)
+3. Complex type (as usual)
+
+The only way to find the right number is to measure.
+
+### IO-bound code
+
+It makes sense to make such code parallel.
+Various Ruby implementations have similar behaviour and performance here.
+
+There always will be a *sweet spot* between utilization and context switching
+and it is important to find it (see [005_io_bound.rb](005_io_bound.rb)).
+
+### CPU-bound code
+
+Computations-rich code on MRI runs better on 1 thread while on other implementations on `N = CPU cores` thread (see [006_cpu_bound.rb](006_cpu_bound.rb)).
+
 [Working With Ruby Threads]: http://www.jstorimer.com/products/working-with-ruby-threads "Working With Ruby Threads"
 
