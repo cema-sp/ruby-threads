@@ -150,5 +150,20 @@ and it is important to find it (see [005_io_bound.rb](005_io_bound.rb)).
 
 Computations-rich code on MRI runs better on 1 thread while on other implementations on `N = CPU cores` thread (see [006_cpu_bound.rb](006_cpu_bound.rb)).
 
+## Thread safety
+
+Thread safe code:
+
+* Doesn't corrupt you data (it will be safe)
+* Leaves your data consistent
+* Leaves semantics of your program correct
+
+Avoid _'check-then-set'_ race conditions (see [007_check_then_set.rb](007_check_then_set.rb)).
+It happens because of *context switching* after check operation (check & set is not **atomic**).
+
+In Ruby, very few things are *guaranteed* to be thread-safe (see [008_array_push.rb](008_array_push.rb) with JRuby or Rubinius).
+
+Operations performed on the same region of memory won't be thread-safe.
+
 [Working With Ruby Threads]: http://www.jstorimer.com/products/working-with-ruby-threads "Working With Ruby Threads"
 
