@@ -165,5 +165,34 @@ In Ruby, very few things are *guaranteed* to be thread-safe (see [008_array_push
 
 Operations performed on the same region of memory won't be thread-safe.
 
+## Mutexes
+
+**Mutex** - mutual exclusion, guarantees that no two threads enter the *critical section* of code at the same time (see [009_array_push_mutex.rb](009_array_push_mutex.rb) with JRuby or Rubinius).  
+Until the owning thread unlocks the mutex, no other thread can lock it.  
+All threads should share one mutex.
+
+The guarantee comes from the OS.
+
+*Critical section* should be selected carefuly (see [010_check_then_set_mutex.rb](010_check_then_set_mutex.rb)).
+
+### Mutexes and memory visibility
+
+It is good practive to use mutex to read value: `s = mutex.synchronize { order.status }`.  
+The reason is due to *low-level details*: the kernel can cache in L2 cache before it's visible in memory. When one thread writes to memory, that operation may exist in cache before it's writen to main memory.
+
+The solution here: **memory barrier** (which implemented in mutexes).
+
+### Mutexes and parallelism
+
+Mutexes prevents parallel execution of critical sections.  
+You should make critical sections as small as possible.
+
+### Deadlocks
+
+**Deadlock** may occure when one thread waiting for a mutex locked by another thread waiting itself for the first one.
+
+One of solutions here: `Mutex#try_lock` method which doesn't wait for mutex but returns `Boolean` value if succeeded or not.  
+Thread may release its mutex if it can't lock another one, but here can occure **livelock** - infinite code cycling.
+
 [Working With Ruby Threads]: http://www.jstorimer.com/products/working-with-ruby-threads "Working With Ruby Threads"
 
