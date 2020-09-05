@@ -177,7 +177,7 @@ The guarantee comes from the OS.
 
 ### Mutexes and memory visibility
 
-It is good practive to use mutex to read value: `s = mutex.synchronize { order.status }`.  
+It is good practice to use mutex to read value: `s = mutex.synchronize { order.status }`.  
 The reason is due to *low-level details*: the kernel can cache in L2 cache before it's visible in memory. When one thread writes to memory, that operation may exist in cache before it's writen to main memory.
 
 The solution here: **memory barrier** (which implemented in mutexes).
@@ -189,7 +189,7 @@ You should make critical sections as small as possible.
 
 ### Deadlocks
 
-**Deadlock** may occure when one thread waiting for a mutex locked by another thread waiting itself for the first one.
+**Deadlock** may occur when one thread waiting for a mutex locked by another thread waiting itself for the first one.
 
 One of solutions here: `Mutex#try_lock` method which doesn't wait for mutex but returns `Boolean` value if succeeded or not.  
 Thread may release its mutex if it can't lock another one, but here can occure **livelock** - infinite code cycling.
